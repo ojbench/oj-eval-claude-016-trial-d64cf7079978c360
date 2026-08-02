@@ -110,37 +110,56 @@ class BPTree {
 
         BPNode right;
         right.leaf = full.leaf;
-        right.cnt = full.cnt - mid;
-        for (int i = 0; i < right.cnt; i++) {
-            right.data[i] = full.data[mid + i];
-        }
-
-        if (!full.leaf) {
-            for (int i = 0; i <= right.cnt; i++) {
-                right.ch[i] = full.ch[mid + i];
-            }
-        } else {
-            right.nxt = full.nxt;
-        }
-
-        full.cnt = mid;
-        int rightp = allocNode();
 
         if (full.leaf) {
+            // Leaf split: copy second half to right node
+            right.cnt = full.cnt - mid;
+            for (int i = 0; i < right.cnt; i++) {
+                right.data[i] = full.data[mid + i];
+            }
+            full.cnt = mid;
+            right.nxt = full.nxt;
+
+            int rightp = allocNode();
             full.nxt = rightp;
+
+            writeNode(p.ch[idx], full);
+            writeNode(rightp, right);
+
+            // Insert separator (copy-up: first key of right node)
+            for (int i = p.cnt; i > idx; i--) {
+                p.data[i] = p.data[i - 1];
+                p.ch[i + 1] = p.ch[i];
+            }
+            p.data[idx] = right.data[0];
+            p.ch[idx + 1] = rightp;
+            p.cnt++;
+        } else {
+            // Internal node split: push middle key up
+            right.cnt = full.cnt - mid - 1;
+            for (int i = 0; i < right.cnt; i++) {
+                right.data[i] = full.data[mid + 1 + i];
+            }
+            for (int i = 0; i <= right.cnt; i++) {
+                right.ch[i] = full.ch[mid + 1 + i];
+            }
+
+            Pair pushUp = full.data[mid];
+            full.cnt = mid;
+
+            int rightp = allocNode();
+            writeNode(p.ch[idx], full);
+            writeNode(rightp, right);
+
+            // Insert separator (push-up: middle key)
+            for (int i = p.cnt; i > idx; i--) {
+                p.data[i] = p.data[i - 1];
+                p.ch[i + 1] = p.ch[i];
+            }
+            p.data[idx] = pushUp;
+            p.ch[idx + 1] = rightp;
+            p.cnt++;
         }
-
-        writeNode(p.ch[idx], full);
-        writeNode(rightp, right);
-
-        for (int i = p.cnt; i > idx; i--) {
-            p.data[i] = p.data[i - 1];
-            p.ch[i + 1] = p.ch[i];
-        }
-
-        p.data[idx] = right.data[0];
-        p.ch[idx + 1] = rightp;
-        p.cnt++;
 
         writeNode(par, p);
     }
