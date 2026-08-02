@@ -181,12 +181,14 @@ class BPTree {
             nd.cnt++;
             writeNode(pos, nd);
         } else {
-            int idx = findPos(nd, p);
+            // For internal nodes, navigate by key only
+            int idx = findPosKey(nd, p.key);
             BPNode ch = readNode(nd.ch[idx]);
             if (ch.cnt >= ORDER) {
                 split(pos, idx);
                 nd = readNode(pos);
-                if (!(p < nd.data[idx])) {
+                // After split, recheck which child to go to
+                if (nd.data[idx].cmpKey(p.key) <= 0) {
                     idx++;
                 }
             }
@@ -274,12 +276,14 @@ public:
         BPNode nd = readNode(root);
         int pos = root;
 
+        // Navigate by key only in internal nodes
         while (!nd.leaf) {
-            int idx = findPos(nd, p);
+            int idx = findPosKey(nd, key);
             pos = nd.ch[idx];
             nd = readNode(pos);
         }
 
+        // Remove exact pair in leaf
         for (int i = 0; i < nd.cnt; i++) {
             if (nd.data[i] == p) {
                 for (int j = i; j < nd.cnt - 1; j++) {
