@@ -186,7 +186,7 @@ class BPTree {
             // For internal nodes, navigate by key only
             int idx = findPosKey(nd, p.key);
             BPNode ch = readNode(nd.ch[idx]);
-            if (ch.cnt >= ORDER) {
+            if (ch.cnt >= ORDER - 1) {  // Split when cnt reaches ORDER-1
                 split(pos, idx);
                 nd = readNode(pos);
                 // After split, recheck which child to go to
@@ -230,7 +230,7 @@ public:
         Pair p(key, val);
         BPNode rt = readNode(root);
 
-        if (rt.cnt >= ORDER) {
+        if (rt.cnt >= ORDER - 1) {  // Split when cnt reaches ORDER-1
             BPNode newrt;
             newrt.leaf = false;
             newrt.cnt = 0;
