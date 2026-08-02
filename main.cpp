@@ -5,7 +5,7 @@
 #include <algorithm>
 
 constexpr int MAX_KEY_LEN = 65;
-constexpr int ORDER = 80; // B+ tree order
+constexpr int ORDER = 50; // B+ tree order - reduced for better performance
 
 struct Pair {
     char key[MAX_KEY_LEN];
@@ -51,6 +51,7 @@ class BPTree {
     void writeInt(int pos, int val) {
         f.seekp(pos);
         f.write((char*)&val, sizeof(int));
+        f.flush();
     }
 
     int readInt(int pos) {
@@ -63,6 +64,7 @@ class BPTree {
     void writeNode(int pos, const BPNode& nd) {
         f.seekp(pos);
         f.write((char*)&nd, sizeof(BPNode));
+        f.flush();
     }
 
     BPNode readNode(int pos) {
